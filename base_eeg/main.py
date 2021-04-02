@@ -11,6 +11,7 @@ from mne_bids import BIDSPath
 import argparse
 import mne
 import sys
+import os
 
 
 if __name__ == "__main__":
