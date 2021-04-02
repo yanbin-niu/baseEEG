@@ -12,6 +12,7 @@ import argparse
 import mne
 import sys
 
+
 if __name__ == "__main__":
     # Argument parser object to allow passing of command line args
     parser = argparse.ArgumentParser(
