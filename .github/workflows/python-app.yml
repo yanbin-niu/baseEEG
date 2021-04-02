@@ -1,0 +1,36 @@
+name: Pylint
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.5, 3.6, 3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 notebook
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Lint with flake8
+      run: |
+         flake8 . --ignore=E501,W503,W504
+    - name: Lint for ipynb
+      run: |
+       mkdir temp
+       find -P ./ -name "*.ipynb" | xargs -i cp {} ./temp
+       echo `ls -A ./temp|wc -w`
+       if [ `ls -A ./temp|wc -w` -eq 0 ]; then exit; fi
+       jupyter nbconvert --to=script --output-dir=/tmp/converted-notebooks/ ./temp/*.ipynb
+       flake8 /tmp/converted-notebooks/*.py --ignore=E501,W503,W504,W391
